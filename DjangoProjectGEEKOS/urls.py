@@ -19,8 +19,7 @@ from django.urls import path
 from Tableau_Periodique import views
 
 urlpatterns = [
-    path('periodic-table/', views.periodic_table_view, name='periodic_table'),
-]
-urlpatterns = [
     path('admin/', admin.site.urls),
+    path('periodic-table/', views.periodic_table_view, name='periodic_table'),
+    path('', views.periodic_table_view, name='home'),  # Redirect the empty path to the periodic table
 ]
