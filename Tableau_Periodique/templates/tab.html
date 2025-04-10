@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau Périodique</title>
+</head>
+<body>
+    <h1>Tableau Périodique</h1>
+    <table>
+        <tr>
+            <th>Élément</th>
+            <th>Symbole</th>
+            <th>Numéro Atomique</th>
+        </tr>
+        {% for element in elements %}
+        <tr>
+            <td>{{ element.name }}</td>
+            <td>{{ element.symbol }}</td>
+            <td>{{ element.atomic_number }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
