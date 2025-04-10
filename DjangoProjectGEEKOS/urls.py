@@ -20,6 +20,7 @@ from Tableau_Periodique import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/elements/', views.get_elements_json, name='get_elements_json'),
     path('periodic-table/', views.periodic_table_view, name='periodic_table'),
     path('', views.periodic_table_view, name='home'),  # Redirect the empty path to the periodic table
 ]
