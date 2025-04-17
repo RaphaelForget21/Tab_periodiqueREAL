@@ -235,21 +235,8 @@
     </div>
 
     <script>
+        
 
-        <div class="tableau-periodique" id="periodic-table">
-            {% for element in elements %}
-                <div class="case {{ element.categorie }}" style="grid-row: {{ element.position_row }}; grid-column: {{ element.position_col }};">
-                    <div class="info">
-                        <span class="numero">{{ element.numero }}</span>
-                        <span class="symbole">{{ element.symbole }}</span>
-                        <span class="nom">{{ element.nom }}</span>
-                        <span class="masse">{{ element.masse }}</span>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        
-        
         // Fonction pour générer une case du tableau périodique
         function createElementCell(element) {
             const div = document.createElement('div');
@@ -380,7 +367,6 @@
                 modal.style.display = "none";
             }
         }
-        
     </script>
 </body>
 </html>
