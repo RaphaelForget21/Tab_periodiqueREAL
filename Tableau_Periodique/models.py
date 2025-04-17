@@ -9,9 +9,9 @@ class Element(models.Model):
     categorie = models.CharField(max_length=50)
     position_row = models.IntegerField()
     position_col = models.IntegerField()
-    atomic_radius = models.FloatField()
-    electronegativity = models.FloatField()
-    melting_point = models.FloatField()
+    atomic_radius = models.CharField(max_length=10, default="x")
+    electronegativity = models.CharField(max_length=10, default="x")
+    melting_point = models.CharField(max_length=10, default="x")
 
     def __str__(self):
         return f"{self.numero} - {self.symbole} - {self.nom} - {self.masse} - {self.categorie} - Row: {self.position_row} - Col: {self.position_col} - Radius: {self.atomic_radius} - EN: {self.electronegativity} - MP: {self.melting_point}"
