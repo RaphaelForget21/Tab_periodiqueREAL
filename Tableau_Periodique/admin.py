@@ -5,6 +5,6 @@ from .models import Element
 
 @admin.register(Element)
 class ElementAdmin(admin.ModelAdmin):
-    list_display = ('numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col', 'atomic_radius', 'electronegativity', 'melting_point')
-    list_editable = ('symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col', 'atomic_radius', 'electronegativity', 'melting_point')
+    list_display = ('numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col')
+    list_editable = ('symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col')
     search_fields = ('numero', 'symbole', 'nom')
