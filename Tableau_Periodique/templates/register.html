@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Tableau Périodique Interactif</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+
+        .site-title {
+            margin-top: 10rem;
+            margin-bottom: 4rem;
+            font-size: 2rem;
+            color: #333333;
+            text-align: center;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: left;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #333333;
+            margin-bottom: 1rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #555555;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        input {
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.8rem;
+            width: 100%;
+            max-width: 200px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .secondary-button {
+            background-color: #28a745;
+        }
+
+        .secondary-button:hover {
+            background-color: #218838;
+        }
+        
+        .third-button {
+            background-color: #6c757d;
+        }
+
+        .third-button:hover {
+            background-color: #5a6268;
+        }
+
+        .footer {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #777777;
+        }
+    </style>
+</head>
+<body>
+    <div class="site-title">Tableau Périodique Interactif</div>
+    <div class="container">
+        <h1>Inscription</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">S'inscrire</button>
+        </form>
+    <a href="{% url 'login' %}" class="button secondary-button">Se connecter</a>
+    <a href="{% url 'periodic_table' %}" class="button third-button">Continuer sans se connecter</a>
+    <div class="footer">
+        <p>Par Geekos</p>
+    </div>
+</div>
