@@ -8,7 +8,7 @@ def periodic_table_view(request):
 
 def get_elements_json(request):
     elements = Element.objects.all().values(
-        'numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col', 'actomic_radius', 'eletronegativity','melting_point'
+        'numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col'
     )
     return JsonResponse(list(elements), safe=False)
 

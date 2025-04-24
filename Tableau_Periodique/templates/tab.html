@@ -236,6 +236,21 @@
 
     <script>
         
+        
+        
+                // Fetch the JSON data
+        fetch('/static/elements_clean.json')
+            .then(response => response.json())
+            .then(data => {
+                const periodicTable = document.getElementById('periodic-table');
+        
+                // Loop through each element and create a cell
+                data.forEach(element => {
+                    const cell = createElementCell(element);
+                    periodicTable.appendChild(cell);
+                });
+            })
+            .catch(error => console.error('Error loading elements:', error));
 
         // Fonction pour générer une case du tableau périodique
         function createElementCell(element) {
@@ -314,24 +329,7 @@
             const hoverDetails = document.getElementById('hover-details');
             hoverDetails.style.display = 'none';
         }
-
-        // Fonction pour générer le tableau périodique
-        function generatePeriodicTable() {
-            const periodicTable = document.getElementById('periodic-table');
-
-            // Remplir le tableau avec des cases vides
-            for (let i = 0; i < 180; i++) {
-                const div = document.createElement('div');
-                div.classList.add('vide');
-                periodicTable.appendChild(div);
-            }
-
-            // Ajouter chaque élément dans sa position respective
-            elements.forEach(element => {
-                const elementCell = createElementCell(element);
-                periodicTable.appendChild(elementCell);
-            });
-        }
+        
 
         // Filtrer les éléments du tableau périodique
         document.querySelectorAll(".filter-btn").forEach(button => {
@@ -346,10 +344,6 @@
                 });
             });
         })
-
-        // Générer le tableau périodique au chargement de la page
-        generatePeriodicTable();
-
         // Obtenir la modale
         const modal = document.getElementById("myModal");
 
