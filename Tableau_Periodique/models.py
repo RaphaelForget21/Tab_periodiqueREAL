@@ -13,5 +13,5 @@ class Element(models.Model):
 
 
     def __str__(self):
-        return f"{self.numero} - {self.symbole} - {self.nom} - {self.masse} - {self.categorie} - Row: {self.position_row} - Col: {self.position_col}"
+        return f"{self.numero} - {self.symbole} - {self.nom} - {self.masse} - {self.categorie} - Row: {self.position_row} - Col: {self.position_col} - Radius: {self.atomic_radius} - EN: {self.electronegativity} - MP: {self.melting_point}"
 
