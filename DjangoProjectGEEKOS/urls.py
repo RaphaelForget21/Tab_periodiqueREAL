@@ -24,4 +24,6 @@ urlpatterns = [
     path('periodic_table/', views.periodic_table_view, name='periodic_table'),  # Example for the periodic table page
     path('', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+    path('save_note/', views.save_note_view, name='save_note'),
 ]
