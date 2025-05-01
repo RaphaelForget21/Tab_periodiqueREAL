@@ -3,128 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - Tableau Périodique Interactif</title>
+    <title>Tableau Périodique Interactif</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             height: 100vh;
+            color: #ffffff;
         }
 
-        .site-title {
-            margin-top: 10rem;
-            margin-bottom: 4rem;
-            font-size: 2rem;
-            color: #333333;
-            text-align: center;
+        .title {
+            color: #016156;
+            margin-bottom: auto; /* Permet au titre de rester en haut */
         }
 
         .container {
             background: #ffffff;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
             text-align: center;
+            color: #333333;
+            margin-top: 1rem; /* Réduction de la marge supérieure */
+            margin-bottom: auto; /* Centre la zone de connexion */
         }
 
         h1 {
-            font-size: 1.8rem;
-            color: #333333;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #00796b;
         }
 
         form {
             display: flex;
             flex-direction: column;
+            align-items: center; /* Align items to the center */
         }
 
-        label {
+        form div {
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Ensure full width for alignment */
+            margin-bottom: 1rem; /* Add spacing between fields */
+        }
+
+        p {
+            margin: 0 0 0.5rem 0; /* Adjust spacing for category names */
             font-size: 1rem;
-            color: #555555;
-            margin-bottom: 0.5rem;
-            text-align: left;
+            font-weight: bold;
+            color: #333333; /* Match text color */
+            text-align: left; /* Align text to the left */
         }
 
         input {
-            padding: 0.8rem;
-            margin-bottom: 1rem;
+            padding: 0.6rem 1rem; /* Ajout d'un padding horizontal pour équilibrer l'espacement */
             border: 1px solid #cccccc;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 1rem;
+            width: calc(100% - 2rem); /* Réduction de la largeur totale pour équilibrer les marges */
+            margin-right: 0; /* Suppression de la marge à droite */
         }
 
         button {
             padding: 0.8rem;
-            background-color: #007bff;
+            background-color: #00796b;
             color: #ffffff;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            align-self: center; /* Center the button */
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #00796b;
+        }
+
+        .secondary-button, .third-button {
+            display: inline-block;
+            padding: 0.5rem; /* Réduction du padding */
+            margin-top: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem; /* Réduction de la taille de la police */
+            text-decoration: none;
+            transition: background-color 0.3s ease;
         }
 
         .secondary-button {
             background-color: #6c757d;
-            margin-top: 1rem;
+            color: #ffffff;
         }
 
         .secondary-button:hover {
             background-color: #5a6268;
         }
 
-        .footer {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #777777;
-        }
-
-        .link-button {
-            margin-top: 1rem;
-            display: inline-block;
-            padding: 0.8rem;
+        .third-button {
             background-color: #28a745;
             color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
         }
 
-        .link-button:hover {
+        .third-button:hover {
             background-color: #218838;
+        }
+
+        .footer {
+            margin-top: 1rem;
+            font-size: 15px; /* Réduction de la taille de la police */
+            color:#808080; /* Changement de la couleur en gris */
+            text-align: center; /* Centrer le texte */
         }
     </style>
 </head>
 <body>
-    <div class="site-title">Tableau Périodique Interactif</div>
+    <h1 class="title">Tableau Périodique Interactif</h1> <!-- Déplacement et ajout de la classe -->
     <div class="container">
         <h1>Connexion</h1>
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
-            <label for="username">Nom d'utilisateur :</label>
-            <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" required>
-
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
-
+            {{ form.non_field_errors }}
+            <div>
+                <p>Nom d'utilisateur</p> <!-- Ajout du nom de la catégorie -->
+                <!-- Suppression du label -->
+                <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" required>
+            </div>
+            <div>
+                <p>Mot de passe</p> <!-- Ajout du nom de la catégorie -->
+                <!-- Suppression du label -->
+                <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+            </div>
             <button type="submit">Se connecter</button>
         </form>
-        <a href="{% url 'register' %}" class="link-button">Créer un compte</a>
-        <button class="secondary-button" onclick="window.location.href='{% url 'periodic_table' %}'">Continuer sans se connecter</button>
+        <a href="{% url 'register' %}" class="secondary-button">Créer un compte</a>
+        <a href="{% url 'periodic_table' %}" class="third-button">Continuer sans se connecter</a>
         <div class="footer">
-            <p>Par Geekos</p>
+            <footer>&copy; 2025 Tableau Périodique Interactif. Tous droits réservés.</footer>
+            <footer>Développé par Geekos</footer>
         </div>
     </div>
 </body>
