@@ -201,11 +201,11 @@
             transform: translateY(-50%);
             background-color: #ffffff;
             border: 2px solid #ccc;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 2px; /* Réduction du padding */
+            border-radius: 8px; /* Réduction du rayon des coins */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
             display: none;
-            width : 200px;
+            width: 150px; /* Réduction de la largeur */
         }
 
         #hover-details .case {
@@ -236,10 +236,63 @@
             margin-top: 10px;
             font-size: 14px;
         }
+        
+        #noteModal {
+            display: none; /* Caché par défaut */
+            position: fixed; /* Rester en place */
+            z-index: 1; /* Au-dessus */
+            left: 0;
+            top: 0;
+            width: 100%; /* Pleine largeur */
+            height: 100%; /* Pleine hauteur */
+            overflow: auto; /* Activer le défilement si nécessaire */
+            background-color: rgba(0,0,0,0.4); /* Noir avec opacité */
+        }
+        #noteModal .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% du haut et centré */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Peut varier selon la taille de l'écran */
+        }
+        #noteTextarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #saveNoteButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #saveNoteButton:hover {
+            background-color: #45a049;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+        #noteModal .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
     </style>
 </head>
 <body>
-    <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    <a href="{% url 'logout' %}" class="logout-button" style="{% if not request.user.is_authenticated %}display: none;{% endif %}">Se Déconnecter</a>
+    <a href="{% url 'login' %}" class="logout-button" style="{% if request.user.is_authenticated %}display: none;{% endif %}">Se Connecter</a>
     <h1>Tableau Périodique des Éléments</h1>
     <p style="text-align: center;">Cliquez sur un bouton pour filtrer les éléments du tableau périodique.<br>Cliquez sur un élément pour afficher la page wikipédia</p>
     <div id="filters">
@@ -276,12 +329,20 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal">
+    <div id="wikiModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <p id="element-details"></p>
         </div>
     </div>
+    <div id="noteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="noteModalHeading">Ajouter une note</h2>
+        <textarea id="noteTextarea" placeholder="Écrivez votre note ici..."></textarea>
+        <button id="saveNoteButton">Sauvegarder la note</button>
+    </div>
+</div>
 
     <script>
         // Fetch the JSON data
@@ -297,6 +358,12 @@
                 });
             })
             .catch(error => console.error('Error loading elements:', error));
+        // Helper function to get CSRF token
+        function getCSRFToken() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            return csrfToken ? csrfToken.value : '';
+        }
+        const isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
 
         // Fonction pour générer une case du tableau périodique
         function createElementCell(element) {
@@ -304,6 +371,7 @@
             div.classList.add('case', element.categorie);
             div.style.gridRowStart = element.position.row;
             div.style.gridColumnStart = element.position.col;
+            div.dataset.numero = element.numero;
 
             const info = `
                 <div class="info">
@@ -314,11 +382,30 @@
                 </div>
             `;
             div.innerHTML = info;
-
+            
             // Ajouter un écouteur d'événement de clic uniquement si l'élément n'est pas vide
             if (element.categorie !== 'vide') {
+                
+                div.addEventListener('contextmenu', () => {
+                    event.preventDefault();
+                    const noteModal = document.getElementById('noteModal');
+                    const noteTextarea = document.getElementById('noteTextarea');
+                    const modalHeading = document.getElementById('noteModalHeading');
+                    modalHeading.textContent = `Ajouter une note pour ${element.nom}`;
+                    if (isAuthenticated) {
+                        noteTextarea.style.display = 'block';
+                        saveNoteButton.style.display = 'block';
+                        noteTextarea.dataset.elementId = element.numero; // Store element ID
+                    } else {
+                        noteTextarea.style.display = 'none';
+                        saveNoteButton.style.display = 'none';
+                        modalHeading.textContent = 'Connectez-vous pour ajouter une note';
+                    }
+                    
+                    noteModal.style.display = 'block'; // Afficher la modale
+                    });
                 div.addEventListener('click', () => {
-                    const modal = document.getElementById("myModal");
+                    const modal = document.getElementById("wikiModal");
                     const elementDetails = document.getElementById("element-details");
 
                     // Récupérer les informations de Wikipedia
@@ -337,12 +424,68 @@
                         });
                 });
             }
+            // Save the note
+            function saveNote() {
+                const noteTextarea = document.getElementById('noteTextarea');
+                const noteContent = noteTextarea.value;
+                const elementId = noteTextarea.dataset.elementId;
+            
+                fetch('/save-note/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        element_id: parseInt(elementId), // Ensure element_id is sent
+                        note: noteContent
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Note saved successfully!');
+                        closeModal(document.getElementById('noteModal'));
+                    } else {
+                        alert('Failed to save note: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error saving note:', error));
+            }
+            document.getElementById('saveNoteButton').onclick = saveNote;
+            
+            // Function to close the modal
+            function closeModal(modal) {
+                modal.style.display = 'none';
+            }
+            
+            // Add a single event listener for closing modals
+            function setupModalClose(modal, closeButton) {
+                // Close the modal when the close button is clicked
+                closeButton.addEventListener('click', () => closeModal(modal));
+            
+                // Close the modal when clicking outside the modal content
+                window.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            }
 
-            // Ajouter des événements de survol
-            div.addEventListener('mouseover', () => showHoverDetails(element));
-            div.addEventListener('mouseout', hideHoverDetails);
-
-            return div;
+            // Setup for noteModal
+            const noteModal = document.getElementById('noteModal');
+            const noteCloseButton = document.querySelector('#noteModal .close');
+            setupModalClose(noteModal, noteCloseButton);
+            
+            // Setup for wikiModal
+            const wikiModal = document.getElementById('wikiModal');
+            const wikiCloseButton = document.querySelector('#wikiModal .close');
+            setupModalClose(wikiModal, wikiCloseButton);
+        
+        // Ajouter des événements de survol
+        div.addEventListener('mouseover', () => showHoverDetails(element));
+        div.addEventListener('mouseout', hideHoverDetails);
+        return div;
         }
 
         function showHoverDetails(element) {
@@ -390,89 +533,15 @@
             });
         });
 
-        // Obtenir la modale
-        const modal = document.getElementById("myModal");
-
-        // Obtenir l'élément <span> qui ferme la modale
-        const span = document.getElementsByClassName("close")[0];
-
-        // Lorsque l'utilisateur clique sur <span> (x), fermer la modale
-        span.onclick = function() {
-            modal.style.display = "none";
-        };
-
-        // Lorsque l'utilisateur clique n'importe où en dehors de la modale, la fermer
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        };
     </script>
-<script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const periodicTable = document.getElementById('periodic-table');
-
-            periodicTable.addEventListener('contextmenu', (event) => {
-                event.preventDefault();
-                const elementDiv = event.target.closest('.case');
-                if (!elementDiv) return;
-
-                const elementId = elementDiv.dataset.id; // Add `data-id` to each element
-                if (!elementId) return;
-
-                // Check if the user is logged in
-                const isLoggedIn = {{ request.user.is_authenticated|lower }};
-                if (!isLoggedIn) {
-                    alert('You must be logged in to add notes.');
-                    return;
-                }
-
-                // Show the note modal
-                const noteModal = document.getElementById('noteModal');
-                const noteTextarea = noteModal.querySelector('textarea');
-                noteModal.style.display = 'block';
-
-                // Load existing note
-                fetch(`/get-note/?element_id=${elementId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        noteTextarea.value = data.note || '';
-                        noteTextarea.dataset.elementId = elementId;
-                    });
-            });
-
-            // Sauvegarder note
-            document.getElementById('saveNoteButton').addEventListener('click', () => {
-                const noteTextarea = document.querySelector('#noteModal textarea');
-                const elementId = noteTextarea.dataset.elementId;
-                const noteText = noteTextarea.value;
-
-                fetch('/save-note/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                    body: JSON.stringify({ element_id: elementId, note: noteText }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Note sauvegardée avec succès!');
-                        document.getElementById('noteModal').style.display = 'none';
-                    } else {
-                        alert("la note n'a pas pu être sauvegardée.");
-                    }
-                });
-            });
-        });
-        <div id="noteModal" style="display: none;">
-        <div class="modal-content">
-            <textarea placeholder="Write your note here..."></textarea>
-            <button id="saveNoteButton">Save Note</button>
-        </div>
-    </div>
-    </script>
-</body>
 </body>
 </html>
+    // ajout des notes:
+    // mauvais:
+    // les notes sont pas unique pour chaque element
+    // les notes sont pas sauvegardé quand on reloade la page
+    // correct:
+    // les notes s'affichent dans une modale avec un click droit
+    // le nom de l'élément s'affiche selon l'élément cliqué
+    // on peut pas ajouter une note si on est pas connecté
+    // aussi ajouté bouton "se déconnecter / se connecter " selon la connection

@@ -1,26 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class Element(models.Model):
-    numero = models.IntegerField(null=True, blank=True)
+    numero = models.IntegerField(unique=True)
     symbole = models.CharField(max_length=5)
-    nom = models.CharField(max_length=100)
-    masse = models.FloatField(null=True, blank=True)
+    nom = models.CharField(max_length=50)
+    masse = models.FloatField()
     categorie = models.CharField(max_length=50)
-    position_row = models.IntegerField(null=True, blank=True)
-    position_col = models.IntegerField(null=True, blank=True)
-
-
+    position_row = models.IntegerField()
+    position_col = models.IntegerField()
 
     def __str__(self):
-        return f"{self.numero} - {self.symbole} - {self.nom} - {self.masse} - {self.categorie} - Row: {self.position_row} - Col: {self.position_col}"
-
+        return f"{self.nom} ({self.symbole})"
 
 class ElementNote(models.Model):
-    element = models.ForeignKey(Element, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    element_id = models.IntegerField()
     note = models.TextField()
 
     def __str__(self):
-        return f"Note for {self.element.nom} by {self.user.username}"
+        return f"Note for Element {self.element_id} by {self.user.username}"
