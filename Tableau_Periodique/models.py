@@ -9,6 +9,10 @@ class Element(models.Model):
     categorie = models.CharField(max_length=50)
     position_row = models.IntegerField()
     position_col = models.IntegerField()
+    electronegativite = models.FloatField(null=True, blank=True)
+    etat = models.CharField(max_length=10, choices=[('solide', 'Solide'), ('liquide', 'Liquide'), ('gaz', 'Gaz')], default='solide')
+    masse_volumique = models.FloatField(null=True, blank=True)
+    point_fusion = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.nom} ({self.symbole})"

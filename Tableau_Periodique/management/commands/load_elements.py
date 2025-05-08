@@ -10,10 +10,12 @@ class Command(BaseCommand):
             data = json.load(f)
 
         for item in data:
-            if Element.objects.filter(symbole=item['symbole']).exists():
-                # verifie que element existe deja  dans DB
-                self.stdout.write(self.style.WARNING(f"Element {item['symbole']} existe deja. sauté..."))
+            # Check and delete existing element by 'numero'
+            if Element.objects.filter(numero=item['numero']).exists():
+                self.stdout.write(self.style.WARNING(f"Element with numero {item['numero']} already existed"))
                 continue
+
+            # Create a new element
             Element.objects.create(
                 numero=item.get('numero') or None,
                 symbole=item['symbole'],
@@ -21,7 +23,11 @@ class Command(BaseCommand):
                 masse=item.get('masse') or None,
                 categorie=item['categorie'],
                 position_row=item['position']['row'],
-                position_col=item['position']['col']
+                position_col=item['position']['col'],
+                electronegativite=item.get('electronegativite') or None,
+                etat=item['etat'],
+                masse_volumique=item.get('masse_volumique') or None,
+                point_fusion=item.get('point_fusion') or None
             )
 
-        self.stdout.write(self.style.SUCCESS("Elements charges avec succes!"))
+        self.stdout.write(self.style.SUCCESS("Elements loaded successfully!"))

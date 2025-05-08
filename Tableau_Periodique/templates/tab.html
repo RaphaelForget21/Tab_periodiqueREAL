@@ -311,21 +311,24 @@
     <div class="tableau-periodique" id="periodic-table">
 
     </div>
-
-    <div id="hover-details">
+    
+    <div id="hover-details" style="display: none;">
         <div class="case">
-            <div class="info">
-                <span class="numero"></span>
-                <span class="symbole"></span>
-                <span class="nom"></span>
-                <span class="masse"></span>
-            </div>
+            <span class="numero"></span>
+            <span class="symbole"></span>
+            <span class="nom"></span>
+            <span class="masse"></span>
         </div>
         <div class="element-info">
-            <p><strong>Numéro Atomique:</strong> <span class="numero"></span></p>
-            <p><strong>Symbole:</strong> <span class="symbole"></span></p>
-            <p><strong>Nom:</strong> <span class="nom"></span></p>
-            <p><strong>Masse Atomique:</strong> <span class="masse"></span></p>
+            <p>Numéro: <span class="numero"></span></p>
+            <p>Symbole: <span class="symbole"></span></p>
+            <p>Nom: <span class="nom"></span></p>
+            <p>Masse: <span class="masse"></span></p>
+            <p>Categorie: <span class="categorie"></span></p>
+            <p>Électronégativité: <span class="electronegativite"></span></p>
+            <p>État: <span class="etat"></span></p>
+            <p>Masse volumique: <span class="masse_volumique"></span></p>
+            <p>Point de fusion: <span class="point_fusion"></span></p>
         </div>
     </div>
 
@@ -372,7 +375,6 @@
             div.style.gridRowStart = element.position.row;
             div.style.gridColumnStart = element.position.col;
             div.dataset.numero = element.numero;
-
             const info = `
                 <div class="info">
                     <span class="numero">${element.numero}</span>
@@ -489,15 +491,17 @@
         }
 
         function showHoverDetails(element) {
+
             if (element.categorie === 'vide') {
                 return;
             }
-
+            
             const hoverDetails = document.getElementById('hover-details');
             hoverDetails.querySelector('.numero').textContent = element.numero;
             hoverDetails.querySelector('.symbole').textContent = element.symbole;
             hoverDetails.querySelector('.nom').textContent = element.nom;
             hoverDetails.querySelector('.masse').textContent = element.masse;
+
 
             // Supprimer les classes de catégorie précédentes
             const caseElement = hoverDetails.querySelector('.case');
@@ -509,6 +513,11 @@
             hoverDetails.querySelector('.element-info .symbole').textContent = element.symbole;
             hoverDetails.querySelector('.element-info .nom').textContent = element.nom;
             hoverDetails.querySelector('.element-info .masse').textContent = element.masse;
+            hoverDetails.querySelector('.element-info .categorie').textContent = element.categorie;
+            hoverDetails.querySelector('.element-info .electronegativite').textContent = element.electronegativite;
+            hoverDetails.querySelector('.element-info .etat').textContent = element.etat;
+            hoverDetails.querySelector('.element-info .masse_volumique').textContent = element.masse_volumique;
+            hoverDetails.querySelector('.element-info .point_fusion').textContent = element.point_fusion;
 
             hoverDetails.style.display = 'block';
         }
@@ -544,4 +553,3 @@
     // les notes s'affichent dans une modale avec un click droit
     // le nom de l'élément s'affiche selon l'élément cliqué
     // on peut pas ajouter une note si on est pas connecté
-    // aussi ajouté bouton "se déconnecter / se connecter " selon la connection

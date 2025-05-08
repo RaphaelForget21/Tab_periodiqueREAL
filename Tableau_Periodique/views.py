@@ -41,7 +41,7 @@ def periodic_table_view(request):
 
 def get_elements_json(request):
     elements = Element.objects.all().values(
-        'numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col'
+        'numero', 'symbole', 'nom', 'masse', 'categorie', 'position_row', 'position_col', 'electronegativite', 'etat','masse_volumique', 'point_fusion'
     )
     return JsonResponse(list(elements), safe=False)
 
