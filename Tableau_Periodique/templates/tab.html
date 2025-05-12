@@ -209,8 +209,8 @@
         }
 
         #hover-details .case {
-            width: 100px;
-            height: 100px;
+            width: 146px;
+            height: 146px;
             font-size: 18px;
         }
 
@@ -221,16 +221,27 @@
             gap: 8px;
             text-align: left;
         }
-
-
-        #hover-details .info .numero,
-        #hover-details .info .symbole  ,
-        #hover-details .info .nom,
-        #hover-details .info .masse {
-            position: static; /* Remove absolute positioning */
-            font-size: 14px; /* Adjust font size */
-            text-align: left; /* Center text */
+        #hover-details .case .numero {
+            font-size: 20px; /* Ajustez la taille pour le numéro */
+            font-weight: bold;
         }
+
+        #hover-details .case .symbole {
+            font-size: 45px; /* Ajustez la taille pour le symbole */
+            font-weight: bold;
+        }
+
+        #hover-details .case .nom {
+            font-size: 18px; /* Ajustez la taille pour le nom */
+        }
+
+        #hover-details .case .masse {
+            font-size: 20px; /* Ajustez la taille pour la masse */
+            font-weight: bold;
+            position: absolute;
+            top: 70px; /* Ajustez cette valeur pour descendre davantage */
+        }
+
 
         #hover-details .element-info {
             margin-top: 10px;
@@ -320,16 +331,15 @@
             <span class="masse"></span>
         </div>
         <div class="element-info">
-            <p>Numéro: <span class="numero"></span></p>
+            <p>Numéro Atomique: <span class="numero"></span></p>
             <p>Symbole: <span class="symbole"></span></p>
             <p>Nom: <span class="nom"></span></p>
-            <p>Masse: <span class="masse"></span></p>
-            <p>Categorie: <span class="categorie"></span></p>
+            <p>Masse Atomique: <span class="masse"></span> u</p>
+            <p>Catégorie: <span class="categorie"></span></p>
             <p>Électronégativité: <span class="electronegativite"></span></p>
-            <p>État: <span class="etat"></span></p>
-            <p>Masse volumique: <span class="masse_volumique"></span></p>
-            <p>Point de fusion: <span class="point_fusion"></span></p>
-        </div>
+            <p>État à 0°C: <span class="etat"></span></p>
+            <p>Masse volumique: <span class="masse_volumique"></span> kg/m<sup>3</sup></p>
+            <p>Point de fusion: <span class="point_fusion"></span> °C</p>        </div>
     </div>
 
     <div id="wikiModal" class="modal">
@@ -490,6 +500,7 @@
         return div;
         }
 
+
         function showHoverDetails(element) {
 
             if (element.categorie === 'vide') {
@@ -508,12 +519,27 @@
             caseElement.className = 'case'; // Réinitialiser à seulement la classe 'case'
             hoverDetails.querySelector('.case').classList.add(element.categorie);
 
+            const categoryMapping = {
+                vide: "Vide",
+                hydrogene: "Hydrogène",
+                alcalin: "Alcalins",
+                alcalino: "Alcalino-Terreux",
+                lanthanide: "Lanthanides",
+                actinides: "Actinides",
+                metalPauvre: "Métaux Pauvres",
+                metalloide: "Métalloïdes",
+                nonMetal: "Non-Métaux",
+                gazNoble: "Gaz Nobles",
+                metalTransition: "Métaux de Transition",
+                inconnu: "Inconnu"
+            };
+
             // Remplir les informations supplémentaires
             hoverDetails.querySelector('.element-info .numero').textContent = element.numero;
             hoverDetails.querySelector('.element-info .symbole').textContent = element.symbole;
             hoverDetails.querySelector('.element-info .nom').textContent = element.nom;
             hoverDetails.querySelector('.element-info .masse').textContent = element.masse;
-            hoverDetails.querySelector('.element-info .categorie').textContent = element.categorie;
+            hoverDetails.querySelector('.element-info .categorie').textContent = categoryMapping[element.categorie] || "Inconnu";
             hoverDetails.querySelector('.element-info .electronegativite').textContent = element.electronegativite;
             hoverDetails.querySelector('.element-info .etat').textContent = element.etat;
             hoverDetails.querySelector('.element-info .masse_volumique').textContent = element.masse_volumique;
@@ -545,11 +571,3 @@
     </script>
 </body>
 </html>
-    // ajout des notes:
-    // mauvais:
-    // les notes sont pas unique pour chaque element
-    // les notes sont pas sauvegardé quand on reloade la page
-    // correct:
-    // les notes s'affichent dans une modale avec un click droit
-    // le nom de l'élément s'affiche selon l'élément cliqué
-    // on peut pas ajouter une note si on est pas connecté
