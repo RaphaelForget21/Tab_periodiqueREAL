@@ -4,6 +4,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Jaini&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <form method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
     <title>Tableau Périodique</title>
     <style>
         body {
@@ -247,7 +250,7 @@
             margin-top: 10px;
             font-size: 14px;
         }
-        
+
         #noteModal {
             display: none; /* Caché par défaut */
             position: fixed; /* Rester en place */
@@ -298,7 +301,7 @@
             font-size: 28px;
             font-weight: bold;
         }
-        
+
     </style>
 </head>
 <body>
@@ -322,7 +325,7 @@
     <div class="tableau-periodique" id="periodic-table">
 
     </div>
-    
+
     <div id="hover-details" style="display: none;">
         <div class="case">
             <span class="numero"></span>
@@ -385,6 +388,16 @@
             div.style.gridRowStart = element.position.row;
             div.style.gridColumnStart = element.position.col;
             div.dataset.numero = element.numero;
+
+             div.oncontextmenu = function(event) {
+        event.preventDefault();
+        if (isAuthenticated) {
+            openNoteModal(element.numero); // Use element.numero instead of element.id
+        } else {
+            alert('You must be logged in to add a note.');
+        }
+    };
+
             const info = `
                 <div class="info">
                     <span class="numero">${element.numero}</span>
@@ -394,28 +407,10 @@
                 </div>
             `;
             div.innerHTML = info;
-            
+
             // Ajouter un écouteur d'événement de clic uniquement si l'élément n'est pas vide
             if (element.categorie !== 'vide') {
-                
-                div.addEventListener('contextmenu', () => {
-                    event.preventDefault();
-                    const noteModal = document.getElementById('noteModal');
-                    const noteTextarea = document.getElementById('noteTextarea');
-                    const modalHeading = document.getElementById('noteModalHeading');
-                    modalHeading.textContent = `Ajouter une note pour ${element.nom}`;
-                    if (isAuthenticated) {
-                        noteTextarea.style.display = 'block';
-                        saveNoteButton.style.display = 'block';
-                        noteTextarea.dataset.elementId = element.numero; // Store element ID
-                    } else {
-                        noteTextarea.style.display = 'none';
-                        saveNoteButton.style.display = 'none';
-                        modalHeading.textContent = 'Connectez-vous pour ajouter une note';
-                    }
-                    
-                    noteModal.style.display = 'block'; // Afficher la modale
-                    });
+
                 div.addEventListener('click', () => {
                     const modal = document.getElementById("wikiModal");
                     const elementDetails = document.getElementById("element-details");
@@ -436,12 +431,50 @@
                         });
                 });
             }
+
+             // Function to open modal and load note
+    function openNoteModal(elementId) {
+        const noteModal = document.getElementById('noteModal');
+        const noteTextarea = document.getElementById('noteTextarea');
+        const modalHeading = document.getElementById('noteModalHeading');
+
+        // Find the element name from the elements in the table
+        const elementCell = document.querySelector(`.case[data-numero="${elementId}"]`);
+        const elementName = elementCell ? elementCell.querySelector('.nom').textContent : 'Element';
+
+        // Set the modal heading
+        modalHeading.textContent = `Ajouter une note pour ${elementName}`;
+
+        // Set the element ID on the textarea
+        noteTextarea.dataset.elementId = elementId;
+
+        // Show the textarea and save button
+        noteTextarea.style.display = 'block';
+        document.getElementById('saveNoteButton').style.display = 'block';
+
+        // Fetch and fill in the note
+        fetch(`/get-note/?element_id=${elementId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    noteTextarea.value = data.note;
+                } else {
+                    alert('Failed to load note: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading note:', error);
+            });
+
+        noteModal.style.display = 'block';
+    }
+
             // Save the note
             function saveNote() {
                 const noteTextarea = document.getElementById('noteTextarea');
                 const noteContent = noteTextarea.value;
                 const elementId = noteTextarea.dataset.elementId;
-            
+
                 fetch('/save-note/', {
                     method: 'POST',
                     headers: {
@@ -449,7 +482,7 @@
                         'X-CSRFToken': getCSRFToken()
                     },
                     body: JSON.stringify({
-                        element_id: parseInt(elementId), // Ensure element_id is sent
+                        element_id: parseInt(elementId),
                         note: noteContent
                     })
                 })
@@ -465,17 +498,17 @@
                 .catch(error => console.error('Error saving note:', error));
             }
             document.getElementById('saveNoteButton').onclick = saveNote;
-            
-            // Function to close the modal
+
+
             function closeModal(modal) {
                 modal.style.display = 'none';
             }
-            
-            // Add a single event listener for closing modals
+
+
             function setupModalClose(modal, closeButton) {
                 // Close the modal when the close button is clicked
                 closeButton.addEventListener('click', () => closeModal(modal));
-            
+
                 // Close the modal when clicking outside the modal content
                 window.addEventListener('click', (event) => {
                     if (event.target === modal) {
@@ -488,12 +521,12 @@
             const noteModal = document.getElementById('noteModal');
             const noteCloseButton = document.querySelector('#noteModal .close');
             setupModalClose(noteModal, noteCloseButton);
-            
+
             // Setup for wikiModal
             const wikiModal = document.getElementById('wikiModal');
             const wikiCloseButton = document.querySelector('#wikiModal .close');
             setupModalClose(wikiModal, wikiCloseButton);
-        
+
         // Ajouter des événements de survol
         div.addEventListener('mouseover', () => showHoverDetails(element));
         div.addEventListener('mouseout', hideHoverDetails);
@@ -506,7 +539,7 @@
             if (element.categorie === 'vide') {
                 return;
             }
-            
+
             const hoverDetails = document.getElementById('hover-details');
             hoverDetails.querySelector('.numero').textContent = element.numero;
             hoverDetails.querySelector('.symbole').textContent = element.symbole;

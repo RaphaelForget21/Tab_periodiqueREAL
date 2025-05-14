@@ -53,22 +53,30 @@ def logout_view(request):
 @csrf_exempt
 def save_note_view(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        element_id = data.get('element_id')
-        note = data.get('note')
+        try:
+            data = json.loads(request.body)
+            element_id = data.get('element_id')
+            note = data.get('note')
 
-        if not element_id or not note:
-            return JsonResponse({'success': False, 'error': 'Invalid data'})
+            if not element_id or not note:
+                return JsonResponse({'success': False, 'error': 'Invalid data'})
 
-        # Save or update the note for the specific user and element
-        ElementNote.objects.update_or_create(
-            user=request.user,
-            element_id=element_id,
-            defaults={'note': note}
-        )
-        return JsonResponse({'success': True})
+            element = Element.objects.get(numero=element_id)
+            ElementNote.objects.update_or_create(
+                user=request.user,
+                element=element,
+                defaults={'note': note}
+            )
+            return JsonResponse({'success': True})
+        except Element.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Element not found'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON format'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 @login_required
 def get_note_view(request):
     element_id = request.GET.get('element_id')
@@ -77,15 +85,18 @@ def get_note_view(request):
         return JsonResponse({'success': False, 'error': 'Invalid or missing element_id'})
 
     try:
-        element_note = ElementNote.objects.get(user=request.user, element_id=int(element_id))
+        element = Element.objects.get(numero=int(element_id))
+        element_note = ElementNote.objects.get(user=request.user, element=element)
         return JsonResponse({'success': True, 'note': element_note.note})
     except ElementNote.DoesNotExist:
         return JsonResponse({'success': True, 'note': ''})  # Return empty note if not found
+    except Element.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Element not found'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return (JsonResponse({'success': False, 'error': str(e)})
 
 @login_required
-@csrf_exempt
+@csrf_exempt)
 def delete_note_view(request):
     if request.method == 'POST':
         try:
@@ -95,14 +106,17 @@ def delete_note_view(request):
             if not element_id or not isinstance(element_id, int):
                 return JsonResponse({'success': False, 'error': 'Invalid or missing element_id'})
 
-            # Delete the note
-            deleted, _ = ElementNote.objects.filter(user=request.user, element_id=element_id).delete()
+            element = Element.objects.get(numero=element_id)
+            deleted, _ = ElementNote.objects.filter(user=request.user, element=element).delete()
             if deleted:
                 return JsonResponse({'success': True})
             else:
                 return JsonResponse({'success': False, 'error': 'Note not found'})
+        except Element.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Element not found'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'Invalid JSON format'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
