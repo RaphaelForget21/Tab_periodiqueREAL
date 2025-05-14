@@ -122,6 +122,16 @@
             color:#808080; /* Changement de la couleur en gris */
             text-align: center; /* Centrer le texte */
         }
+        .message {
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        .message.success {
+            color: green; /* Success messages in green */
+        }
+        .message.error {
+            color: red; /* Error messages in red */
+        }
     </style>
 </head>
 <body>
@@ -147,6 +157,13 @@
                 <p>Confirmez le mot de passe</p> <!-- Ajout du nom de la catégorie -->
                 <input type="password" name="password2" required id="id_password2" placeholder="Confirmez votre mot de passe">
             </div>
+            {% if messages %}                                                                                                                                                             
+            
+                {% for message in messages %}
+                    <div {% if message.tags %} class="message {{ message.tags }}"{% endif %}>{{ message }}</div>
+                {% endfor %}
+            
+            {% endif %}
             <button type="submit">S'inscrire</button>
         </form>
         <a href="{% url 'login' %}" class="link-button">Se connecter</a>

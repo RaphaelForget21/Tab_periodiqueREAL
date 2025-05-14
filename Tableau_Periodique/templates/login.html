@@ -20,7 +20,7 @@
 
         .title {
             color: #016156;
-            margin-bottom: auto; /* Permet au titre de rester en haut */
+            padding-top: 200px;
         }
 
         .container {
@@ -122,6 +122,17 @@
             color:#808080; /* Changement de la couleur en gris */
             text-align: center; /* Centrer le texte */
         }
+    
+        .message {
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        .message.success {
+            color: green; /* Success messages in green */
+        }
+        .message.error {
+            color: red; /* Error messages in red */
+        }
     </style>
 </head>
 <body>
@@ -141,6 +152,13 @@
                 <!-- Suppression du label -->
                 <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
             </div>
+            {% if messages %}                                                                                                                                                             
+            
+                {% for message in messages %}
+                    <div {% if message.tags %} class="message {{ message.tags }}"{% endif %}>{{ message }}</div>
+                {% endfor %}
+            
+            {% endif %}
             <button type="submit">Se connecter</button>
         </form>
         <a href="{% url 'register' %}" class="secondary-button">Créer un compte</a>
