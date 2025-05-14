@@ -19,6 +19,8 @@ def register_view(request):
             user.save()
             messages.success(request, "Utilisateur crée avec succès!")
             return redirect('login')
+        else:
+            messages.error(request, "Erreur lors de la création de l'utilisateur.")
     else:
         form = CustomUserRegistrationForm()
     return render(request, 'register.html', {'form': form})
